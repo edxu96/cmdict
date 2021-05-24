@@ -15,3 +15,20 @@ def remove_punctuation(s):
     """
     table = str.maketrans("", "", string.punctuation + SPECIAL_CHARS)
     return s.translate(table)
+
+
+def remove_newline(s):
+    r"""Remove newline escape ``\n`` in a given string.
+
+    Args:
+        s (str): some string might containing none/one/multiple newline
+            escapes.
+
+    Returns:
+        str: The string without any newline escape.
+    """
+    splits = s.split("\n")
+    res = ""
+    for split in splits:
+        res += split
+    return res
