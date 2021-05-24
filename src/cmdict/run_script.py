@@ -11,6 +11,7 @@ from tqdm import tqdm
 import yaml
 
 from cmdict.ecdict_connector import ECDICTConnector
+from cmdict.german import Verb
 from cmdict.pdf_tools import extract_words
 from cmdict.txt_tools import scan_words
 
@@ -93,7 +94,7 @@ def search(words, german):
     """
     if german:
         for _, word in enumerate(words):
-            _echo_item_de(word, None)
+            _echo_item_de(word, Verb(word).to_adoc())
     else:
         if _valid_db_exists():
             db_engine = ECDICTConnector()
@@ -201,7 +202,8 @@ def _echo_item_de(word, res):
     """
     _echo_divider()
     if res:
-        click.echo(Fore.CYAN + Style.BRIGHT + res + "\n")
+        click.echo(Fore.CYAN + Style.BRIGHT + word + "\n" + Style.RESET_ALL)
+        click.echo(res)
     else:
         click.echo(
             Fore.RED
