@@ -5,6 +5,7 @@ from typing import Optional, Tuple
 from bs4 import BeautifulSoup
 import requests
 
+from cmdict.check import check_de
 from cmdict.utils import remove_newline
 
 _LINK_REVERSO = (
@@ -84,8 +85,7 @@ class Word:
             spelling: how the word is spelled. The spelling will be
                 checked when initiating.
         """
-        checked = spelling
-        # checked = check_spelling(spelling)
+        checked = check_de(spelling)
 
         #: str: how to spell.
         self.spelling = checked
