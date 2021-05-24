@@ -22,7 +22,7 @@ def path2yaml(tmp_path_factory):
             temporary a path.
 
     Returns:
-        str: initated path.
+        str: initiated path.
     """
     return str(
         tmp_path_factory.mktemp("tmp", numbered=False) / ".history.yaml"

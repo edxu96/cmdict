@@ -3,10 +3,11 @@ from enum import Enum
 from typing import Optional, Tuple
 
 from bs4 import BeautifulSoup
+from loguru import logger
 import requests
 
 from cmdict.check import check_de
-from cmdict.utils import remove_newline
+from cmdict.utils import remove_cdot, remove_newline
 
 _LINK_REVERSO = (
     "https://conjugator.reverso.net/" + "conjugation-german-verb-{origin}.html"
@@ -134,7 +135,17 @@ class Word:
         tag = soup.find(
             "p", attrs=_ATTRS_SYLLABIFICATION
         ).next_element.next_element.next_element
-        self.syllabification = tag.text
+
+        # Extra info in some webpage, which is not essential, so only
+        # the str before the first comma is preserved.
+        raw = tag.text.split(",")[0]
+        if remove_cdot(raw) != self.spelling:
+            logger.warning(
+                f'The syllabification of "{self.spelling}", "{raw}", '
+                "is not correct"
+            )
+
+        self.syllabification = raw
 
 
 class Verb:
