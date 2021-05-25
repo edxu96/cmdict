@@ -30,12 +30,13 @@ _PRINT_PRESENT = {
     "sie": "Sie",
 }
 _HEADERS_PRESENT = ["Präsens", "Spelling", "IPA"]
-_ADOC_VERB = """
+_ADOC_VERB = """== {origin}
+
 [cols="1,1,1"]
 |===
 |Personalpronomen |Spelling |IPA
 
-{content}|===
+{conjugations}|===
 """
 _ATTRS_SYLLABIFICATION = {"title": "Trennungsmöglichkeiten am Zeilenumbruch"}
 _LINK_WIKI = "https://de.wiktionary.org/wiki/{word}"
@@ -148,17 +149,18 @@ class Word:
         self.syllabification = raw
 
 
-class Verb:
+class Verb(Word):
     """German verb."""
 
-    def __init__(self, origin: str) -> None:
+    def __init__(self, spelling: str) -> None:
         """Init a German verb based on its original form.
 
         Args:
-            origin: a German verb in its original form.
+            spelling: a German verb in its original form.
         """
-        self.origin = origin
-        self.link_reverso = _LINK_REVERSO.format(origin=self.origin)
+        super().__init__(spelling)
+
+        self.link_reverso = _LINK_REVERSO.format(origin=self.spelling)
 
         self.present = _PRESENT
         self.crawl_present()
@@ -173,8 +175,8 @@ class Verb:
         conjugations = present.find_all("li")
         for i in range(6):
             which = _PRESENT_LIST[i]
-            spelling = conjugations[i].text.split(" ")[1]
-            self.present[which] = VerbConjugation(which, spelling, self.origin)
+            how = conjugations[i].text.split(" ")[1]
+            self.present[which] = VerbConjugation(which, how, self.spelling)
 
     # def __str__(self) -> str:
     #     data = [
@@ -188,10 +190,14 @@ class Verb:
         Returns:
             Present conjugations in Asciidoc-friendly format.
         """
-        content = ""
+        conjugations = ""
         for row in _PRESENT_LIST:
-            content += f"{self.present[row]._info_adoc}\n"
-        return _ADOC_VERB.format(content=content)
+            conjugations += f"{self.present[row]._info_adoc}\n"
+
+        origin = self.syllabification + " " + self.ipa
+
+        res = _ADOC_VERB.format(conjugations=conjugations, origin=origin)
+        return res
 
 
 class VerbConjugation(Word):
