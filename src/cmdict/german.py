@@ -30,7 +30,7 @@ _PRINT_PRESENT = {
     "sie": "Sie",
 }
 _HEADERS_PRESENT = ["Präsens", "Spelling", "IPA"]
-_FRAME_ADOC = """
+_ADOC_VERB = """
 [cols="1,1,1"]
 |===
 |Personalpronomen |Spelling |IPA
@@ -42,7 +42,7 @@ _LINK_WIKI = "https://de.wiktionary.org/wiki/{word}"
 _CLASS_TABLE = (
     "wikitable float-right inflection-table flexbox " + "hintergrundfarbe2"
 )
-_FRAME_ADOC = """
+_ADOC_NOUN = """
 [cols="1,1,1,1"]
 |===
 |Singular |Spelling |Singular |Spelling
@@ -191,7 +191,7 @@ class Verb:
         content = ""
         for row in _PRESENT_LIST:
             content += f"{self.present[row]._info_adoc}\n"
-        return _FRAME_ADOC.format(content=content)
+        return _ADOC_VERB.format(content=content)
 
 
 class VerbConjugation(Word):
@@ -305,5 +305,5 @@ class Noun(Word):
                 row += "|" + ", ".join(self.spellings[form]) + " "
             content += row + "\n"
 
-        res = _FRAME_ADOC.format(content=content)
+        res = _ADOC_NOUN.format(content=content)
         return res
