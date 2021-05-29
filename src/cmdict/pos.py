@@ -22,12 +22,12 @@ class PartOfSpeechDe(Enum):
     Adj = "adjective"
 
 
-def crawl_pos_de(word: str, id: str) -> Union[PartOfSpeechDe, None]:
+def crawl_pos_de(word: str, id_api: str) -> Union[PartOfSpeechDe, None]:
     """Crawl part of speech for a German word in ``api.pons.com``.
 
     Args:
         word: a German word, whose spelling should have been checked.
-        id: API id displayed in the registration of ``api.pons.com``.
+        id_api: API ID displayed in ``api.pons.com`` registration.
 
     Note:
         - Not sure if the implementation is robust enough, because there
@@ -41,12 +41,12 @@ def crawl_pos_de(word: str, id: str) -> Union[PartOfSpeechDe, None]:
         Part of speech for the German word.
     """
     crawled = requests.get(
-        url=URL_API.format(word=word), headers={'X-Secret': id}
+        url=URL_API.format(word=word), headers={"X-Secret": id_api}
     )
 
     if crawled.status_code == 200:
-        pos_raw = crawled.json()[0]['hits'][0]['roms'][0]['wordclass']
-        pos_raw_list = pos_raw.split(' ')
+        pos_raw = crawled.json()[0]["hits"][0]["roms"][0]["wordclass"]
+        pos_raw_list = pos_raw.split(" ")
 
         if PartOfSpeechDe.Verb.value in pos_raw_list:
             pos = PartOfSpeechDe.Verb
