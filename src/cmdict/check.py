@@ -9,11 +9,11 @@ def check_de(word: str) -> str:
     """Return a corrected German spelling if not.
 
     Args:
-        word: some German word.
+        word: some German word input by user.
 
     Note:
-        It seems that ``pyspellchecker`` does not support capitalisation
-        in German, like that for nouns.
+        It seems that ``pyspellchecker``, the package used here, does
+        not support capitalisation in German, like that for nouns.
 
     Returns:
         The most likely German word corresponding to the input spelling.

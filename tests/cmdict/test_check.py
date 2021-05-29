@@ -8,5 +8,10 @@ def test_check_de():
     assert check_de("Danke") == "Danke"
     assert check_de("Dant") == "dann"
     assert check_de("dank") == "dank"
+
     assert check_de("schlafe") == "schlafe"
     assert check_de("schlafee") == "schlafen"
+    assert check_de("schläfst") == "schläfst"
+
+    # Capitalisation in German is not supported here.
+    assert check_de("Schläfst") == "Schläfst"
