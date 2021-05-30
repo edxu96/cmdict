@@ -3,9 +3,14 @@ from cmdict.check import check_de
 
 
 def test_check_de():
-    """See if correct and incorrect German words can be checked."""
-    assert check_de("Dank") == "Dank"
-    assert check_de("Danke") == "Danke"
+    """See if correct and incorrect German words can be checked.
+
+    Note:
+        Capitalisation in German is not supported here, because they are
+        all returned in lower case.
+    """
+    assert check_de("Dank") == "dank"
+    assert check_de("Danke") == "danke"
     assert check_de("Dant") == "dann"
     assert check_de("dank") == "dank"
 
@@ -13,5 +18,4 @@ def test_check_de():
     assert check_de("schlafee") == "schlafen"
     assert check_de("schläfst") == "schläfst"
 
-    # Capitalisation in German is not supported here.
-    assert check_de("Schläfst") == "Schläfst"
+    assert check_de("Schläfst") == "schläfst"

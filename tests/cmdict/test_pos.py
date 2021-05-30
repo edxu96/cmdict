@@ -11,5 +11,7 @@ def test_crawl_pos_de_pons():
 
     assert crawl_pos_de("Hilfe", SECRET) == PartOfSpeechDe.Noun
     assert crawl_pos_de("hilfe", SECRET) == PartOfSpeechDe.Noun
+    assert crawl_pos_de("Kind", SECRET) == PartOfSpeechDe.Noun
+    assert crawl_pos_de("kind", SECRET) == PartOfSpeechDe.Noun
 
     assert crawl_pos_de("schön", SECRET) is None

@@ -1,11 +1,19 @@
-"""Function to determine part of speech for a word."""
+"""Function to determine part of speech for a word using pons API.
+
+Note:
+    - ``l`` may yield results in both German-English and English-German
+      directions.
+    - ``in`` specifies the source language.
+    - Read more about pons API in
+      https://en.pons.com/p/files/uploads/pons/api/api-documentation.pdf
+"""
 from enum import Enum
 from typing import Union
 
 from loguru import logger
 import requests
 
-URL_API = "https://api.pons.com/v1/dictionary?l=deen&q={word}"
+URL_API = "https://api.pons.com/v1/dictionary?l=deen&in=de&q={word}"
 
 
 class PartOfSpeechDe(Enum):
@@ -55,7 +63,7 @@ def crawl_pos_de(word: str, id_api: str) -> Union[PartOfSpeechDe, None]:
         else:
             pos = None
             logger.warning(
-                f'Part of speech for German word, "{word}", is unknown.'
+                f'Part of speech for German spelling, "{word}", is unknown.'
             )
     else:
         logger.error(f'Incorrect request to "api.pons.com" for {word}.')

@@ -1,13 +1,16 @@
-"""Classes for German verbs and nouns."""
+"""A function for German word searching return based on several classes."""
 from enum import Enum
-from typing import Optional, Tuple
+from typing import Optional, Tuple, Union
 
 from bs4 import BeautifulSoup
 from loguru import logger
 import requests
 
 from cmdict.check import check_de
+from cmdict.pos import crawl_pos_de, PartOfSpeechDe
 from cmdict.utils import remove_cdot, remove_newline
+
+__all__ = ["search_word_de"]
 
 _LINK_REVERSO = (
     "https://conjugator.reverso.net/" + "conjugation-german-verb-{origin}.html"
@@ -50,6 +53,26 @@ _ADOC_NOUN = """
 
 {content}|===
 """
+_SECRET = "556e44c4daf89fe1f32c661284dbabca2caac043e949ff4ead175af30732a15d"
+
+
+def search_word_de(spelling: str) -> Union[str, None]:
+    """Check spelling, detect PoS and get printout based on it class.
+
+    Args:
+        spelling: a spelling specified as German.
+
+    Returns:
+        Printout of search result or None if not supported.
+    """
+    word = check_de(spelling)
+    if crawl_pos_de(word, _SECRET) == PartOfSpeechDe.Noun:
+        res = Noun(word).to_adoc()
+    elif crawl_pos_de(word, _SECRET) == PartOfSpeechDe.Verb:
+        res = Verb(word).to_adoc()
+    else:
+        res = None
+    return res
 
 
 class Gender(Enum):
@@ -87,10 +110,8 @@ class Word:
             spelling: how the word is spelled. The spelling will be
                 checked when initiating.
         """
-        checked = check_de(spelling)
-
         #: str: how to spell.
-        self.spelling = checked
+        self.spelling = spelling
         #: str: how to pronounce in International Phonetic Alphabet.
         self.ipa = None
         #: str: the ``Wiktionary`` link for it.
@@ -245,13 +266,16 @@ class VerbConjugation(Word):
 class Noun(Word):
     """German noun."""
 
-    def __init__(self, spelling: str) -> None:
+    def __init__(self, checked: str) -> None:
         """Init for a German noun based on its spelling.
 
         Args:
-            spelling: how the conjugation looks like.
+            checked: a checked spelling for a German noun in lower case.
         """
-        super().__init__(spelling)
+        # Capitalise the first letter.
+        word = checked[:1].upper() + checked[1:]
+
+        super().__init__(word)
 
         self.articles = None
         self.spellings = None

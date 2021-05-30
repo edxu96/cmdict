@@ -1,5 +1,5 @@
 """Test classes for German verbs and nouns."""
-from cmdict.german import Noun, Verb, VerbConjugation
+from cmdict.german import Noun, search_word_de, Verb, VerbConjugation
 
 
 def test_verb():
@@ -42,3 +42,9 @@ def test_noun():
     print(n.to_adoc())
 
     n = Noun("Fußball")
+
+
+def test_search_word_de():
+    """Check if a spelling can be corrected and its PoS is detected."""
+    assert "Personalpronomen" in search_word_de("schlafen")
+    assert "Singular" in search_word_de("Kind")

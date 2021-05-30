@@ -11,7 +11,7 @@ from tqdm import tqdm
 import yaml
 
 from cmdict.ecdict_connector import ECDICTConnector
-from cmdict.german import Verb
+from cmdict.german import search_word_de
 from cmdict.pdf_tools import extract_words
 from cmdict.txt_tools import scan_words
 
@@ -94,7 +94,7 @@ def search(words, german):
     """
     if german:
         for _, word in enumerate(words):
-            _echo_item_de(word, Verb(word).to_adoc())
+            _echo_item_de(word, search_word_de(word))
     else:
         if _valid_db_exists():
             db_engine = ECDICTConnector()
@@ -197,8 +197,8 @@ def _echo_item_de(word, res):
     """Echo a German word search result to cli.
 
     Args:
-        word (str): The word.
-        res (dict): The word search result.
+        word (str): A German word.
+        res (Union[str, None]): The search result.
     """
     _echo_divider()
     if res:
@@ -210,7 +210,7 @@ def _echo_item_de(word, res):
             + Style.BRIGHT
             + word
             + Style.RESET_ALL
-            + " can not be returned successfully!"
+            + " is not supported!"
         )
 
 
