@@ -1,5 +1,5 @@
 """Test function to determine part of speech for a word."""
-from cmdict.pos import crawl_pos_de, PartOfSpeechDe
+from cmdict.german.pos import crawl_pos_de, PartOfSpeechDe
 
 SECRET = "556e44c4daf89fe1f32c661284dbabca2caac043e949ff4ead175af30732a15d"
 

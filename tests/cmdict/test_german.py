@@ -1,5 +1,9 @@
 """Test classes for German verbs and nouns."""
-from cmdict.german import Noun, search_word_de, Verb, VerbConjugation
+from cmdict.german import search_word_de
+from cmdict.german.noun import Noun
+from cmdict.german.verb import Verb, VerbConjugation
+
+NOUN = {"Kind"}
 
 
 def test_verb():
