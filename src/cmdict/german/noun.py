@@ -88,6 +88,9 @@ class Noun(Word):
 
         super().__init__(word)
 
+        self.gender = Gender.N
+        """Gender: which grammatical gender this word belongs to."""
+
         self.articles = {}
         self.spellings = {}
 

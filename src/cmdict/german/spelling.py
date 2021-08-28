@@ -1,4 +1,6 @@
 """A function for German word searching return based on several classes."""
+from typing import Optional
+
 from bs4 import BeautifulSoup
 from loguru import logger
 import requests
@@ -81,3 +83,27 @@ class Word:
             )
 
         self.syllabification = raw
+
+
+class InflectedWordForm(Word):
+    """Represent a inflected word for a German word."""
+
+    def __init__(
+        self,
+        spelling: str,
+        which: Optional[str] = None,
+        origin: Optional[str] = None,
+    ) -> None:
+        """Init an inflected word for mainly based on its spelling.
+
+        Args:
+            spelling: how the inflected word looks like.
+            which: what kind of inflection it is. Default to be none.
+            origin: its original form.
+        """
+        super().__init__(spelling)
+
+        #: str: what kind of conjugation it is.
+        self.which = which
+        #: str: the original form.
+        self.origin = origin
