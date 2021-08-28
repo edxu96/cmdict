@@ -26,17 +26,17 @@ class Word:
         #: str: how to spell.
         self.spelling = spelling
         #: str: how to pronounce in International Phonetic Alphabet.
-        self.ipa = None
+        self.ipa = ""
         #: str: the ``Wiktionary`` link for it.
         self.link_wiki = _LINK_WIKI.format(word=self.spelling)
         # str: how to spell after syllabification.
-        self.syllabification = None
+        self.syllabification = ""
 
-        soup = self.crawl()
+        soup = self.crawl_wiktionary()
         self._assign_ipa(soup)
         self._assign_syllabification(soup)
 
-    def crawl(self) -> BeautifulSoup:
+    def crawl_wiktionary(self) -> BeautifulSoup:
         """Crawl the webpage of the conjugation from ``Wiktionary``.
 
         Returns:

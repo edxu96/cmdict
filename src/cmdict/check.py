@@ -17,7 +17,8 @@ def check_de(spelling: str) -> str:
         - Every char is turned to its lower case.
 
     Returns:
-        The most likely German spelling corresponding to the input spelling.
+        The most likely German spelling corresponding to the input
+        spelling.
     """
     spelling = spelling.lower()
 

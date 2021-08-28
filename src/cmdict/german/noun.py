@@ -29,6 +29,8 @@ class Gender(Enum):
         can seem arbitrary to English learners, especially as words for
         'things' can have any gender".
 
+    .. [hammer2017german] Durrell, M. (2017). Hammer's German grammar
+        and usage. Routledge.
     """
 
     M = "masculine"
@@ -86,10 +88,10 @@ class Noun(Word):
 
         super().__init__(word)
 
-        self.articles = None
-        self.spellings = None
+        self.articles = {}
+        self.spellings = {}
 
-        self.soup = self.crawl()
+        self.soup = self.crawl_wiktionary()
         self._assign_tables()
 
     def _assign_tables(self):
