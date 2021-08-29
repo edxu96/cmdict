@@ -36,11 +36,6 @@ class Case(Enum):
     A = "akkusativ"
 
 
-#: List[Tuple[str, bool, Gender, Case]]: spelling attributes of 16
-#:     German articles.
-_ARTICLES_DEF_DATA = [("der", True, Gender.M, Case.N)]
-
-
 class DeclensionMethod(Enum):
     """Enumeration for eight ways to inflect a German noun."""
 
@@ -108,3 +103,55 @@ class Declension(InflectedWordForm):
             gender=gender,
             case=declension.value[0],
         )
+
+
+#: List[Tuple[str, bool, Gender, Case]]: spelling and features of 16
+#:     German articles.
+_ARTICLES_DEF = [
+    ("der", True, Gender.M, Case.N),
+    ("die", True, Gender.F, Case.N),
+    ("das", True, Gender.N, Case.N),
+    ("die", False, Gender.X, Case.N),
+    ("den", True, Gender.M, Case.A),
+    ("die", True, Gender.F, Case.A),
+    ("das", True, Gender.N, Case.A),
+    ("die", False, Gender.X, Case.A),
+    ("des", True, Gender.M, Case.G),
+    ("der", True, Gender.F, Case.G),
+    ("des", True, Gender.N, Case.G),
+    ("der", False, Gender.X, Case.G),
+    ("dem", True, Gender.M, Case.D),
+    ("der", True, Gender.F, Case.D),
+    ("dem", True, Gender.N, Case.D),
+    ("den", False, Gender.X, Case.D),
+]
+#: Dict[Tuple[bool, Gender, Case], Declension]: 16 German articles keyed
+#:     by their three features.
+ARTICLES_DEF = {
+    (item[1], item[2], item[3]): Declension(
+        item[0], None, item[1], item[2], item[3]
+    )
+    for item in _ARTICLES_DEF
+}
+#: List[Tuple[str, bool, Gender, Case]]: spelling and features of 16
+#:     German articles.
+_ARTICLES_INDEF = [
+    ("ein", True, Gender.M, Case.N),
+    ("eine", True, Gender.F, Case.N),
+    ("ein", True, Gender.N, Case.N),
+    ("einen", True, Gender.M, Case.A),
+    ("eine", True, Gender.F, Case.A),
+    ("ein", True, Gender.N, Case.A),
+    ("eines", True, Gender.M, Case.G),
+    ("einer", True, Gender.F, Case.G),
+    ("eines", True, Gender.N, Case.G),
+    ("einem", True, Gender.M, Case.D),
+    ("einer", True, Gender.F, Case.D),
+    ("einem", True, Gender.N, Case.D),
+]
+ARTICLES_INDEF = {
+    (item[1], item[2], item[3]): Declension(
+        item[0], None, item[1], item[2], item[3]
+    )
+    for item in _ARTICLES_DEF
+}

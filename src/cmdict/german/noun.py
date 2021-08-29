@@ -1,5 +1,10 @@
 """Class for German noun."""
-from cmdict.german.article import Case, Declension, DeclensionMethod, Gender
+from cmdict.german.article import (
+    Case,
+    Declension,
+    DeclensionMethod,
+    Gender,
+)
 from cmdict.utils import remove_newline
 
 _CLASS_TABLE = (
