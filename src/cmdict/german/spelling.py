@@ -21,6 +21,10 @@ class Word:
     def __init__(self, spelling: str) -> None:
         """Init for a German word based on its spelling.
 
+        Note:
+            The corresponding ``Wiktionary`` webpage is automatically
+            crawled and parsed.
+
         Args:
             spelling: how the word is spelled. The spelling will be
                 checked when initiating.
