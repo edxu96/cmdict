@@ -1,10 +1,10 @@
 """German articles."""
-from enum import Enum
+from enum import auto, Enum, Flag
 
 from cmdict.german.spelling import InflectedWordForm
 
 
-class Gender(Enum):
+class Gender(Flag):
     """Enumeration for three German grammar genders.
 
     The concept of grammatical gender in German is discussed in
@@ -21,13 +21,13 @@ class Gender(Enum):
         and usage. Routledge.
     """
 
-    M = "masculine"
-    F = "feminine"
-    N = "neuter"
-    X = "not considered"
+    M = auto()  # masculine
+    F = auto()  # feminine
+    N = auto()  # neuter
+    X = M | F | N
 
 
-class Case(Enum):
+class Case(Flag):
     """Enumeration for four cases of an (inflected) German noun."""
 
     N = "norminativ"
@@ -37,7 +37,7 @@ class Case(Enum):
 
 
 class DeclensionMethod(Enum):
-    """Enumeration for eight ways to inflect a German noun."""
+    """Enumeration for eight ways to inflect a German noun origin."""
 
     NS = (Case.N, True)  # "Norminativ Singular"
     NP = (Case.N, False)  # "Norminativ Plural"
@@ -67,8 +67,8 @@ class Declension(InflectedWordForm):
             origin: the original word form of this word. None if this
                 word form is the origin.
             singular: whether this word is singular.
-            case: which case this word represents.
             gender: which grammatical gender this word belongs to.
+            case: which case this word represents.
         """
         super().__init__(spelling, origin=origin)
 
@@ -135,7 +135,7 @@ ARTICLES_DEF = {
 }
 #: List[Tuple[str, bool, Gender, Case]]: spelling and features of 16
 #:     German articles.
-_ARTICLES_INDEF = [
+_ARTICLES_IND = [
     ("ein", True, Gender.M, Case.N),
     ("eine", True, Gender.F, Case.N),
     ("ein", True, Gender.N, Case.N),
@@ -149,9 +149,9 @@ _ARTICLES_INDEF = [
     ("einer", True, Gender.F, Case.D),
     ("einem", True, Gender.N, Case.D),
 ]
-ARTICLES_INDEF = {
+ARTICLES_IND = {
     (item[1], item[2], item[3]): Declension(
         item[0], None, item[1], item[2], item[3]
     )
-    for item in _ARTICLES_INDEF
+    for item in _ARTICLES_IND
 }

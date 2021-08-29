@@ -2,6 +2,7 @@
 from loguru import logger
 
 from cmdict.german.article import (
+    ARTICLES_DEF,
     Case,
     Declension,
     DeclensionMethod,
@@ -22,7 +23,58 @@ _ADOC = """
 _GENDER = {"m": Gender.M, "f": Gender.F, "n": Gender.N}
 
 
-class Noun(Declension):
+class DeclensionNoun(Declension):
+    """Represent (inflected) form of a German noun."""
+
+    def __init__(
+        self,
+        spelling: str,
+        origin: str,
+        singular: bool,
+        gender: Gender,
+        case: Case,
+    ) -> None:
+        """Init based on attribute and find its gender and articles.
+
+        Args:
+            spelling: how this inflected word is spelled.
+            origin: the original word form of this word. None if this
+                word form is the origin.
+            singular: whether this word is singular.
+            gender: which grammatical gender this word belongs to.
+            case: which case this word represents.
+        """
+        super().__init__(spelling, origin, singular, gender, case)
+
+        #: Declension: corresponding definite article.
+        self.article_def = None
+
+        self._find_gender()
+        self._find_articles()
+
+    def _find_articles(self):
+        """Find corresponding definite and indefinite article."""
+        if not self.singular:
+            the_key = (self.singular, Gender.X, self.case)
+        else:
+            the_key = (self.singular, self.gender, self.case)
+
+        self.article_def = ARTICLES_DEF[the_key]
+
+    def _find_gender(self):
+        """Find gender in crawled ``wiktionary`` and assign the value."""
+        try:
+            text_raw = (
+                self.soup.find("h3").find("span", class_="mw-headline").text
+            )
+            gender_raw = text_raw.split(", ")[1]
+            self.gender = _GENDER[gender_raw]
+        except (AttributeError, KeyError):
+            logger.critical(f"Gender for {self.spelling} is not found.")
+            self.gender = None
+
+
+class Noun(DeclensionNoun):
     """Represent a singular nominative German noun served as origin.
 
     For every noun, there are three grammatical features:
@@ -41,9 +93,7 @@ class Noun(Declension):
         # Capitalise the first letter.
         word = checked[:1].upper() + checked[1:]
 
-        super().__init__(word, None, True, Case.N, Gender.X)
-
-        self._find_gender()
+        super().__init__(word, None, True, None, Case.N)
 
         self.articles = {}
         """Dict[str, str]: article for each declension."""
@@ -53,18 +103,6 @@ class Noun(Declension):
         """Dict[str, List[str]]: inflected form for each declension."""
 
         self._assign_tables()
-
-    def _find_gender(self):
-        """Find gender in crawled ``wiktionary`` and assign the value."""
-        try:
-            text_raw = (
-                self.soup.find("h3").find("span", class_="mw-headline").text
-            )
-            gender_raw = text_raw.split(", ")[1]
-            self.gender = _GENDER[gender_raw]
-        except (AttributeError, KeyError):
-            logger.critical(f"Gender for {self.spelling} is not found.")
-            self.gender = None
 
     def _assign_tables(self):
         """Store table for eight forms of a German noun in two dicts.

@@ -1,6 +1,6 @@
 """Test classes for German verbs and nouns."""
 from cmdict.german import search_word_de
-from cmdict.german.article import Gender
+from cmdict.german.article import ARTICLES_DEF, Case, Gender
 from cmdict.german.noun import Noun
 from cmdict.german.verb import Verb, VerbConjugation
 
@@ -39,13 +39,29 @@ def test_verb_adoc():
     print(v.to_adoc())
 
 
-def test_noun():
-    """Check class for German nouns."""
-    n1 = Noun("Kind")
-    assert n1.gender == Gender.N, '"Kind" is a neuter noun.'
+def test_noun_kid():
+    """Check object for noun, "Kind"."""
+    obj = Noun("Kind")
+    assert obj.gender == Gender.N, '"Kind" is a neuter noun.'
+    assert obj.singular, '"Kind" is singular.'
+    assert (
+        obj.article_def == ARTICLES_DEF[(True, Gender.N, Case.N)]
+    ), 'Definite article for "Kind".'
+    assert (
+        obj.article_def.spelling == "das"
+    ), 'Definite article for "Kind" is "das".'
 
-    n2 = Noun("Fußball")
-    assert n2.gender == Gender.M, '"Fußball" should be a masculine noun.'
+
+def test_noun_football():
+    """Check object for noun, "Fußball"."""
+    obj = Noun("Fußball")
+    assert obj.gender == Gender.M, '"Fußball" should be a masculine noun.'
+    assert (
+        obj.article_def == ARTICLES_DEF[(True, Gender.M, Case.N)]
+    ), 'Definite article for "Kind".'
+    assert (
+        obj.article_def.spelling == "der"
+    ), 'Definite article for "Kind" is "der".'
 
 
 def test_search_word_de():
