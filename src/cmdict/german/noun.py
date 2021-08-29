@@ -1,7 +1,7 @@
 """Class for German noun."""
 from enum import Enum
 
-from cmdict.german.spelling import Word
+from cmdict.german.spelling import InflectedWordForm, Word
 from cmdict.utils import remove_newline
 
 _CLASS_TABLE = (
@@ -38,8 +38,8 @@ class Gender(Enum):
     N = "neuter"
 
 
-class Case(Enum):
-    """Enumeration for four cases for German noun."""
+class NounCase(Enum):
+    """Enumeration for four cases of an (inflected) German noun."""
 
     N = "norminativ"
     G = "gernitiv"
@@ -47,24 +47,59 @@ class Case(Enum):
     A = "akkusativ"
 
 
-class NumberNoun(Enum):
-    """Enumeration for number represented by a German noun."""
+class DeclensionMethod(Enum):
+    """Enumeration for eight ways to inflect a German noun."""
 
-    S = "singuler"
-    P = "plural"
+    NS = (NounCase.N, True)  # "Norminativ Singular"
+    NP = (NounCase.N, False)  # "Norminativ Plural"
+    GS = (NounCase.G, True)  # "Gernitiv Singular"
+    GP = (NounCase.G, False)  # "Gernitiv Plural"
+    DS = (NounCase.D, True)  # "Dativ Singuler"
+    DP = (NounCase.D, False)  # "Dativ Plural"
+    AS = (NounCase.A, True)  # "Akkusativ Singuler"
+    AP = (NounCase.A, False)  # "Akkusativ Plural"
 
 
-class FormNoun(Enum):
-    """Enumeration for eight forms of a German noun."""
+class Declension(InflectedWordForm):
+    """Represent one declension of a German noun."""
 
-    NS = "Norminativ Singular"
-    NP = "Norminativ Plural"
-    GS = "Gernitiv Singular"
-    GP = "Gernitiv Plural"
-    DS = "Dativ Singuler"
-    DP = "Dativ Plural"
-    AS = "Akkusativ Singuler"
-    AP = "Akkusativ Plural"
+    def __init__(
+        self, spelling: str, origin: str, singular: bool, case: NounCase
+    ) -> None:
+        """Init a declension based on detailed declension method.
+
+        Args:
+            spelling: how this inflected word is spelled.
+            origin: the original word form of this word.
+            singular: whether this word is singular.
+            case: which case this word represents.
+        """
+        super().__init__(spelling, origin=origin)
+
+        self.singular = singular
+        self.case = case
+
+    @classmethod
+    def from_method(
+        cls, spelling: str, origin: str, declension: DeclensionMethod
+    ):
+        """Init a declension based on basic info and declension method.
+
+        Args:
+            spelling: how the declension is spelled.
+            origin: how the original form is spelled.
+            declension: which declension method is used.
+
+        Returns:
+            An object storing detailed declension method, IPA, and
+            syllabification.
+        """
+        return cls(
+            spelling=spelling,
+            origin=origin,
+            singular=declension.value[1],
+            case=declension.value[0],
+        )
 
 
 class Noun(Word):
@@ -92,7 +127,11 @@ class Noun(Word):
         """Gender: which grammatical gender this word belongs to."""
 
         self.articles = {}
+        """Dict[str, str]: article for each declension."""
         self.spellings = {}
+        """Dict[str, List[str]]: spelling(s) for each declension."""
+        self.declensions = {}
+        """Dict[str, List[str]]: inflected form for each declension."""
 
         self.soup = self.crawl_wiktionary()
         self._assign_tables()
@@ -107,30 +146,42 @@ class Noun(Word):
 
         articles = {}
         spellings = {}
-        iter_form = iter(FormNoun)
+        declensions = {}
+        iter_form = iter(DeclensionMethod)
         for row in table.find_all("tr")[1:5]:
             for cell in row.find_all("td")[0:2]:
                 article = cell.text.split(" ")[0]
-                # There might be two forms in one cell.
+                how_declension = next(iter_form)
+                # There might be two word forms in one cell.
                 if len(cell.find_all()) >= 2:
-                    spelling_1 = remove_newline(
+                    spelling_list = [
+                        remove_newline(cell.text.split(article + " ")[i])
+                        for i in [1, 2]
+                    ]
+                    declension_list = [
+                        Declension.from_method(
+                            spelling, self.spelling, how_declension
+                        )
+                        for spelling in spelling_list
+                    ]
+                else:
+                    spelling = remove_newline(
                         cell.text.split(article + " ")[1]
                     )
-                    spelling_2 = remove_newline(
-                        cell.text.split(article + " ")[2]
-                    )
-                    spelling = [spelling_1, spelling_2]
-                else:
-                    spelling = [
-                        remove_newline(cell.text.split(article + " ")[1])
+                    spelling_list = [spelling]
+                    declension_list = [
+                        Declension.from_method(
+                            spelling, self.spelling, how_declension
+                        )
                     ]
 
-                which_form = next(iter_form)
-                spellings[which_form] = spelling
-                articles[which_form] = article
+                spellings[how_declension] = spelling_list
+                articles[how_declension] = article
+                declensions[how_declension] = declension_list
 
         self.articles = articles
         self.spellings = spellings
+        self.declensions = declensions
 
     def to_adoc(self) -> str:
         """Print eight forms of German noun in Asciidoc-friendly format.
@@ -140,13 +191,13 @@ class Noun(Word):
         """
         content = ""
 
-        iter_form = iter(FormNoun)
+        iter_form = iter(DeclensionMethod)
         for i in range(4):
             row = ""
             for j in range(2):
-                form = next(iter_form)
-                row += f"|{self.articles[form]} "
-                row += "|" + ", ".join(self.spellings[form]) + " "
+                declension = next(iter_form)
+                row += f"|{self.articles[declension]} "
+                row += "|" + ", ".join(self.spellings[declension]) + " "
             content += row + "\n"
 
         res = _ADOC.format(content=content)

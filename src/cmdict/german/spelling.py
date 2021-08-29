@@ -55,8 +55,11 @@ class Word:
             soup: the crawled ``Wiktionary`` webpage.
         """
         #: str: how to pronounce in IPA without bracket.
-        ipa = soup.find("span", class_="ipa").text
-        self.ipa = f"[{ipa}]"
+        try:
+            ipa = soup.find("span", class_="ipa").text
+            self.ipa = f"[{ipa}]"
+        except AttributeError:
+            logger.critical(f"IPA for {self.spelling} is not found.")
 
     def _assign_syllabification(self, soup: BeautifulSoup):
         """Find spelling after syllabification in crawled webpage.
@@ -91,19 +94,15 @@ class InflectedWordForm(Word):
     def __init__(
         self,
         spelling: str,
-        which: Optional[str] = None,
         origin: Optional[str] = None,
     ) -> None:
         """Init an inflected word for mainly based on its spelling.
 
         Args:
             spelling: how the inflected word looks like.
-            which: what kind of inflection it is. Default to be none.
             origin: its original form.
         """
         super().__init__(spelling)
 
-        #: str: what kind of conjugation it is.
-        self.which = which
         #: str: the original form.
         self.origin = origin
