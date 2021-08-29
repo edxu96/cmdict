@@ -37,10 +37,11 @@ class Word:
         self.link_wiki = _LINK_WIKI.format(word=self.spelling)
         # str: how to spell after syllabification.
         self.syllabification = ""
+        # BeautifulSoup: crawled ``Wiktionary`` webpage.
+        self.soup = self.crawl_wiktionary()
 
-        soup = self.crawl_wiktionary()
-        self._assign_ipa(soup)
-        self._assign_syllabification(soup)
+        self._find_ipa()
+        self._find_syllabification()
 
     def crawl_wiktionary(self) -> BeautifulSoup:
         """Crawl the webpage of the conjugation from ``Wiktionary``.
@@ -52,31 +53,24 @@ class Word:
         soup = BeautifulSoup(source, "lxml")
         return soup
 
-    def _assign_ipa(self, soup: BeautifulSoup):
-        """Find IPA in crawled webpage.
-
-        Args:
-            soup: the crawled ``Wiktionary`` webpage.
-        """
+    def _find_ipa(self):
+        """Find IPA in crawled webpage."""
         #: str: how to pronounce in IPA without bracket.
         try:
-            ipa = soup.find("span", class_="ipa").text
+            ipa = self.soup.find("span", class_="ipa").text
             self.ipa = f"[{ipa}]"
         except AttributeError:
             logger.critical(f"IPA for {self.spelling} is not found.")
 
-    def _assign_syllabification(self, soup: BeautifulSoup):
+    def _find_syllabification(self):
         """Find spelling after syllabification in crawled webpage.
 
         Note:
             The <p> tag with title "Worttrennung" is found first, and
             the syllabification is the first description list (tagged
             with "dl") following it.
-
-        Args:
-            soup: the crawled ``Wiktionary`` webpage.
         """
-        tag = soup.find(
+        tag = self.soup.find(
             "p", attrs=_ATTRS_SYLLABIFICATION
         ).next_element.next_element.next_element
 

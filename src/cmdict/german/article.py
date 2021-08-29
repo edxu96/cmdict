@@ -153,5 +153,5 @@ ARTICLES_INDEF = {
     (item[1], item[2], item[3]): Declension(
         item[0], None, item[1], item[2], item[3]
     )
-    for item in _ARTICLES_DEF
+    for item in _ARTICLES_INDEF
 }

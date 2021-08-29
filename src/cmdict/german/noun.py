@@ -1,4 +1,6 @@
 """Class for German noun."""
+from loguru import logger
+
 from cmdict.german.article import (
     Case,
     Declension,
@@ -17,6 +19,7 @@ _ADOC = """
 
 {content}|===
 """
+_GENDER = {"m": Gender.M, "f": Gender.F, "n": Gender.N}
 
 
 class Noun(Declension):
@@ -40,6 +43,8 @@ class Noun(Declension):
 
         super().__init__(word, None, True, Case.N, Gender.X)
 
+        self._find_gender()
+
         self.articles = {}
         """Dict[str, str]: article for each declension."""
         self.spellings = {}
@@ -47,8 +52,19 @@ class Noun(Declension):
         self.declensions = {}
         """Dict[str, List[str]]: inflected form for each declension."""
 
-        self.soup = self.crawl_wiktionary()
         self._assign_tables()
+
+    def _find_gender(self):
+        """Find gender in crawled ``wiktionary`` and assign the value."""
+        try:
+            text_raw = (
+                self.soup.find("h3").find("span", class_="mw-headline").text
+            )
+            gender_raw = text_raw.split(", ")[1]
+            self.gender = _GENDER[gender_raw]
+        except (AttributeError, KeyError):
+            logger.critical(f"Gender for {self.spelling} is not found.")
+            self.gender = None
 
     def _assign_tables(self):
         """Store table for eight forms of a German noun in two dicts.
